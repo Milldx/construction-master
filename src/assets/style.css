@@ -1,0 +1,202 @@
+/* ============================================================
+   МастерСтрой — дизайн-система
+   Возврат к первой палитре: тёмно-синий + оранжевый
+   + настоящее ПРОЗРАЧНОЕ стекло (низкий alpha + blur)
+   ============================================================ */
+
+:root {
+  /* ── ОСНОВНЫЕ ЦВЕТА ──────────────────────────────────────── */
+  --navy:        #16223A;  /* Тёмно-синий — Hero, Advantages, футер */
+  --navy-dark:   #0E1626;  /* Ещё темнее — навбар, самые тёмные зоны */
+  --orange:      #F4A235;  /* Акцент — кнопки, цифры, иконки */
+  --orange-dark: #E0901F;  /* Hover у кнопок */
+  --orange-rgb:  244,162,53; /* То же в R,G,B — для rgba() */
+
+  /* ── ТЕКСТ ───────────────────────────────────────────────── */
+  --text:        #1F2430;  /* Основной текст на светлом фоне */
+  --muted:       #6B7280;  /* Вторичный текст на светлом фоне */
+  --text-on-dark:      #F5F7FA; /* Текст на тёмном фоне */
+  --text-on-dark-2:    rgba(245,247,250, 0.62); /* Вторичный текст на тёмном */
+  --text-on-dark-3:    rgba(245,247,250, 0.40); /* Третичный (лейблы) */
+
+  /* ── ФОНЫ ────────────────────────────────────────────────── */
+  --light:  #F7F8FA;  /* Светлые секции (Services, Portfolio, Steps...) */
+  --white:  #FFFFFF;
+  --border: #E5E7EB;  /* Рамки на светлом фоне */
+
+  /* ── СТЕКЛО — ПРОЗРАЧНОЕ ─────────────────────────────────────
+     Важно: alpha здесь НИЗКИЙ (0.07–0.10) — это и даёт настоящую
+     прозрачность. Если поднять alpha до 0.6+ — получится матовое
+     стекло (как было в прошлой версии). Мы explicitly хотим
+     обратный эффект — видно, что происходит ЗА стеклом.
+     ─────────────────────────────────────────────────────────── */
+  --glass-dark-bg:     rgba(255,255,255, 0.07);
+  --glass-dark-border: rgba(255,255,255, 0.16);
+  --glass-light-bg:     rgba(255,255,255, 0.45);
+  --glass-light-border: rgba(255,255,255, 0.70);
+
+  /* ── ТЕНИ ────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
+  --shadow-md: 0 4px 18px rgba(0,0,0,0.10);
+  --shadow-lg: 0 10px 36px rgba(0,0,0,0.16);
+  --shadow-orange: 0 4px 20px rgba(var(--orange-rgb), 0.35);
+
+  /* ── ФОРМА ───────────────────────────────────────────────── */
+  --radius-sm:   6px;
+  --radius:      10px;
+  --radius-lg:   18px;
+  --radius-pill: 100px;
+
+  /* ── ШРИФТЫ ──────────────────────────────────────────────── */
+  --font-body:    'Inter', sans-serif;
+  --font-heading: 'Montserrat', sans-serif;
+  --container:    1200px;
+}
+
+/* ── RESET ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--white);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4 { font-family: var(--font-heading); line-height: 1.15; color: var(--navy); }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+button { cursor: pointer; border: none; font-family: var(--font-body); }
+img { max-width: 100%; display: block; }
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1; /* контейнер всегда НАД орбами (у орбов z-index:0) */
+}
+
+/* ══════════════════════════════════════════════════════════
+   ПРОЗРАЧНОЕ СТЕКЛО
+   .glass       — для тёмных секций (Hero, Advantages, Calculator)
+   .glass-light — для светлых секций (Services, Portfolio, Reviews)
+   ══════════════════════════════════════════════════════════ */
+.glass {
+  background:      var(--glass-dark-bg);
+  backdrop-filter:      blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid var(--glass-dark-border);
+}
+
+.glass-light {
+  background:      var(--glass-light-bg);
+  backdrop-filter:      blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid var(--glass-light-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── ОРБЫ — то, что просвечивает через стекло ─────────────── */
+.section-orbs {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.orb { position: absolute; border-radius: 50%; filter: blur(80px); }
+.orb--orange { background: radial-gradient(circle, var(--orange) 0%, transparent 72%); opacity: 0.45; }
+.orb--blue   { background: radial-gradient(circle, #3B82F6 0%, transparent 72%); opacity: 0.35; }
+/* Облегчённые версии орбов для светлых секций — иначе будет грязно */
+.orb--orange-soft { background: radial-gradient(circle, var(--orange) 0%, transparent 72%); opacity: 0.16; }
+.orb--blue-soft   { background: radial-gradient(circle, #3B82F6 0%, transparent 72%); opacity: 0.12; }
+
+/* ── КНОПКИ ──────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px;
+  background: var(--orange);
+  color: var(--navy-dark);
+  font-weight: 700; font-size: 15px;
+  border-radius: var(--radius-pill);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-orange);
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  background: var(--orange-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 26px rgba(var(--orange-rgb), 0.48);
+}
+
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 31px;
+  background: transparent;
+  color: var(--text-on-dark);
+  font-weight: 600; font-size: 15px;
+  border: 1.5px solid rgba(255,255,255,0.30);
+  border-radius: var(--radius-pill);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-outline:hover { border-color: var(--orange); color: var(--orange); }
+
+.btn-outline-dark {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 31px;
+  background: transparent;
+  color: var(--navy);
+  font-weight: 600; font-size: 15px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-pill);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-outline-dark:hover { border-color: var(--orange); color: var(--orange-dark); }
+
+/* ── СЕКЦИИ ──────────────────────────────────────────────── */
+.section { padding: 96px 0; position: relative; }
+.section--light { background: var(--light); }
+.section--dark  { background: var(--navy); }
+
+.section-header { margin-bottom: 52px; }
+
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 14px;
+}
+
+.section-title {
+  font-size: clamp(30px, 4.3vw, 44px);
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.section-title--light { color: var(--white); }
+
+.section-desc {
+  font-size: 17px;
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.72;
+}
+.section-desc--dark { color: var(--text-on-dark-2); }
+
+@media (max-width: 768px) {
+  .section { padding: 64px 0; }
+  .section-header { margin-bottom: 36px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ПЕРЕХОД МЕЖДУ СТРАНИЦАМИ
+   Имена классов формируются из name="page", заданного в
+   <Transition> в App.vue: page-enter-active, page-leave-active и т.д.
+   ══════════════════════════════════════════════════════════ */
+.page-enter-active, .page-leave-active { transition: opacity 0.25s ease; }
+.page-enter-from, .page-leave-to       { opacity: 0; }

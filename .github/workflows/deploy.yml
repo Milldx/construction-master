@@ -1,0 +1,53 @@
+name: Деплой на GitHub Pages
+
+# Запускается автоматически при каждом push в main —
+# именно поэтому отдельная команда "npm run deploy" больше не нужна.
+on:
+  push:
+    branches: [main]
+
+# Права, нужные именно для публикации на GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Если запушить два раза подряд быстро — отменяем предыдущий незавершённый деплой
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Скачиваем код репозитория
+        uses: actions/checkout@v4
+
+      - name: Устанавливаем Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Устанавливаем зависимости (npm ci — строго по package-lock.json)
+        run: npm ci
+
+      - name: Собираем прод-версию (то же, что npm run build)
+        run: npm run build
+
+      - name: Готовим папку dist для публикации на Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Публикуем собранный сайт
+        id: deployment
+        uses: actions/deploy-pages@v4

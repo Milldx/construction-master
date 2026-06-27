@@ -1,0 +1,13 @@
+# Зависимости — ставятся через npm install, в git не нужны (весят гигабайты)
+node_modules/
+
+# Результат сборки (npm run build) — генерируется автоматически
+dist/
+
+# Файлы редакторов и ОС
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Логи
+npm-debug.log*
